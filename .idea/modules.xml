@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Transpot.iml" filepath="$PROJECT_DIR$/Transpot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TransRubahApi.iml" filepath="$PROJECT_DIR$/TransRubahApi.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
