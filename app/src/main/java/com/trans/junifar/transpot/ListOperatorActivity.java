@@ -1,8 +1,6 @@
 package com.trans.junifar.transpot;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -12,15 +10,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.trans.junifar.transp.R;
+import com.trans.junifar.transp.async.RetrieveBrands;
 import com.trans.junifar.transp.db.sqlite.DBHelper;
 
 import java.util.ArrayList;
@@ -53,48 +54,78 @@ public class ListOperatorActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        openAndQueryDatabase();
 
-        displayResultList();
-    }
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        TextView textView = (TextView) findViewById(R.id.infoAsync);
+        listView = (ListView) findViewById(R.id.samplelist);
 
-    private void displayResultList() {
-        TextView tView = new TextView(this);
-        tView.setText("This data is retrieved from the database and only 4 " +
-                "of the results are displayed");
-    }
+        String[] values = new String[]{
+                "Android List View",
+                "Adapter implementation",
+                "Simple List View In Android",
+                "Create List View Android",
+                "Android Example",
+                "List View Source Code",
+                "List View Array Adapter",
+                "Android Example List View",
+        };
 
-    private void openAndQueryDatabase() {
-        try {
-            DBHelper dbHelper = new DBHelper(this.getApplicationContext());
-            newDB = dbHelper.getWritableDatabase();
-            Cursor c = newDB.rawQuery("SELECT FirstName, Age FROM " +
-                    tableName +
-                    " where Age > 10 LIMIT 4", null);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, values);
 
-            if (c != null) {
-                if (c.moveToFirst()) {
-                    do {
-                        String firstName = c.getString(c.getColumnIndex("FirstName"));
-                        int age = c.getInt(c.getColumnIndex("Age"));
-                        results.add("Name: " + firstName + ",Age: " + age);
-                    } while (c.moveToNext());
-                }
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int itemPosition = position;
+
+                String itemValue = (String) listView.getItemAtPosition(itemPosition);
+
+                Toast.makeText(getApplicationContext(), "Position : " + itemPosition + " List Item : " + itemValue, Toast.LENGTH_LONG).show();
             }
-        } catch (SQLiteException se) {
-            Log.e(getClass().getSimpleName(), "Could not create or Open the database");
-        } finally {
-            if (newDB != null)
-                newDB.execSQL("DELETE FROM " + tableName);
-            newDB.close();
-        }
+        });
+
+        new RetrieveBrands(progressBar, textView).execute();
+
     }
+
+//    private void displayResultList() {
+//        TextView tView = new TextView(this);
+//        tView.setText("This data is retrieved from the database and only 4 " +
+//                "of the results are displayed");
+//    }
+//
+//    private void openAndQueryDatabase() {
+//        try {
+//            DBHelper dbHelper = new DBHelper(this.getApplicationContext());
+//            newDB = dbHelper.getWritableDatabase();
+//            Cursor c = newDB.rawQuery("SELECT FirstName, Age FROM " +
+//                    tableName +
+//                    " where Age > 10 LIMIT 4", null);
+//
+//            if (c != null) {
+//                if (c.moveToFirst()) {
+//                    do {
+//                        String firstName = c.getString(c.getColumnIndex("FirstName"));
+//                        int age = c.getInt(c.getColumnIndex("Age"));
+//                        results.add("Name: " + firstName + ",Age: " + age);
+//                    } while (c.moveToNext());
+//                }
+//            }
+//        } catch (SQLiteException se) {
+//            Log.e(getClass().getSimpleName(), "Could not create or Open the database");
+//        } finally {
+//            if (newDB != null)
+//                newDB.execSQL("DELETE FROM " + tableName);
+//            newDB.close();
+//        }
+//    }
 
     @Override
     public void onBackPressed() {
