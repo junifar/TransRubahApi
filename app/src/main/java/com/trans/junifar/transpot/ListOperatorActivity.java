@@ -1,6 +1,5 @@
 package com.trans.junifar.transpot;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -14,26 +13,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.trans.junifar.transp.R;
 import com.trans.junifar.transp.async.RetrieveBrands;
-import com.trans.junifar.transp.db.sqlite.DBHelper;
-
-import java.util.ArrayList;
 
 public class ListOperatorActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private SQLiteDatabase newDB;
-    private String tableName = DBHelper.tableName;
-    private ArrayList<String> results = new ArrayList<String>();
     private ListView listView;
-    private ArrayAdapter<String> listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +33,7 @@ public class ListOperatorActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        assert fab != null;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -54,82 +45,36 @@ public class ListOperatorActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        assert drawer != null;
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        assert navigationView != null;
         navigationView.setNavigationItemSelectedListener(this);
 
 
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        TextView textView = (TextView) findViewById(R.id.infoAsync);
         listView = (ListView) findViewById(R.id.samplelist);
-
-        String[] values = new String[]{
-                "Android List View",
-                "Adapter implementation",
-                "Simple List View In Android",
-                "Create List View Android",
-                "Android Example",
-                "List View Source Code",
-                "List View Array Adapter",
-                "Android Example List View",
-        };
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, values);
-
-        listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int itemPosition = position;
 
-                String itemValue = (String) listView.getItemAtPosition(itemPosition);
+                String itemValue = (String) listView.getItemAtPosition(position);
 
-                Toast.makeText(getApplicationContext(), "Position : " + itemPosition + " List Item : " + itemValue, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Position : " + position + " List Item : " + itemValue, Toast.LENGTH_LONG).show();
             }
         });
 
-        new RetrieveBrands(progressBar, textView).execute();
+        new RetrieveBrands(progressBar, listView, this).execute();
 
     }
-
-//    private void displayResultList() {
-//        TextView tView = new TextView(this);
-//        tView.setText("This data is retrieved from the database and only 4 " +
-//                "of the results are displayed");
-//    }
-//
-//    private void openAndQueryDatabase() {
-//        try {
-//            DBHelper dbHelper = new DBHelper(this.getApplicationContext());
-//            newDB = dbHelper.getWritableDatabase();
-//            Cursor c = newDB.rawQuery("SELECT FirstName, Age FROM " +
-//                    tableName +
-//                    " where Age > 10 LIMIT 4", null);
-//
-//            if (c != null) {
-//                if (c.moveToFirst()) {
-//                    do {
-//                        String firstName = c.getString(c.getColumnIndex("FirstName"));
-//                        int age = c.getInt(c.getColumnIndex("Age"));
-//                        results.add("Name: " + firstName + ",Age: " + age);
-//                    } while (c.moveToNext());
-//                }
-//            }
-//        } catch (SQLiteException se) {
-//            Log.e(getClass().getSimpleName(), "Could not create or Open the database");
-//        } finally {
-//            if (newDB != null)
-//                newDB.execSQL("DELETE FROM " + tableName);
-//            newDB.close();
-//        }
-//    }
 
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert drawer != null;
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -180,6 +125,7 @@ public class ListOperatorActivity extends AppCompatActivity
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert drawer != null;
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
